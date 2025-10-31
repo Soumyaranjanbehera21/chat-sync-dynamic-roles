@@ -1,14 +1,27 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import { RoleSelector } from '@/components/RoleSelector';
+import { ChatInterface } from '@/components/ChatInterface';
+import { ClientRole } from '@/types/chat';
 
 const Index = () => {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
+  const [userRole, setUserRole] = useState<ClientRole | null>(null);
+  const [username, setUsername] = useState<string>('');
+
+  const handleRoleSelect = (role: ClientRole, name: string) => {
+    setUserRole(role);
+    setUsername(name);
+  };
+
+  const handleLeave = () => {
+    setUserRole(null);
+    setUsername('');
+  };
+
+  if (!userRole) {
+    return <RoleSelector onRoleSelect={handleRoleSelect} />;
+  }
+
+  return <ChatInterface role={userRole} username={username} onLeave={handleLeave} />;
 };
 
 export default Index;
