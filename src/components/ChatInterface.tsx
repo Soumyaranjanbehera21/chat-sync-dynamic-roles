@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ClientRole } from '@/types/chat';
+import { ClientRole, ChatState } from '@/types/chat';
 import { useChatSync } from '@/hooks/useChatSync';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,10 +12,12 @@ interface ChatInterfaceProps {
   role: ClientRole;
   username: string;
   onLeave: () => void;
+  sharedChatState: ChatState;
+  setSharedChatState: React.Dispatch<React.SetStateAction<ChatState>>;
 }
 
-export const ChatInterface = ({ role, username, onLeave }: ChatInterfaceProps) => {
-  const { chatState, acquireReadLock, releaseReadLock, sendMessage } = useChatSync();
+export const ChatInterface = ({ role, username, onLeave, sharedChatState, setSharedChatState }: ChatInterfaceProps) => {
+  const { chatState, acquireReadLock, releaseReadLock, sendMessage } = useChatSync(sharedChatState, setSharedChatState);
   const [messageInput, setMessageInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 

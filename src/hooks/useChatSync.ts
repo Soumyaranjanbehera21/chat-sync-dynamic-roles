@@ -1,22 +1,11 @@
-import { useState, useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { Message, ClientRole, ChatState } from '@/types/chat';
 import { toast } from '@/hooks/use-toast';
 
-export const useChatSync = () => {
-  const [chatState, setChatState] = useState<ChatState>({
-    messages: [
-      {
-        id: '1',
-        content: 'Welcome to the Readers-Writers Chat System! Writers can send messages, Readers can view them.',
-        author: 'System',
-        timestamp: new Date(),
-        role: 'reader',
-      },
-    ],
-    activeReaders: 0,
-    activeWriters: 0,
-    writeLock: false,
-  });
+export const useChatSync = (
+  chatState: ChatState,
+  setChatState: React.Dispatch<React.SetStateAction<ChatState>>
+) => {
 
   const lockRef = useRef<boolean>(false);
   const readersRef = useRef<number>(0);
@@ -41,7 +30,7 @@ export const useChatSync = () => {
       title: "Reader Access Granted",
       description: `Active readers: ${readersRef.current}`,
     });
-  }, []);
+  }, [setChatState]);
 
   const releaseReadLock = useCallback(() => {
     readersRef.current--;
@@ -56,7 +45,7 @@ export const useChatSync = () => {
       activeReaders: readersRef.current,
       writeLock: lockRef.current,
     }));
-  }, []);
+  }, [setChatState]);
 
   const acquireWriteLock = useCallback(() => {
     while (lockRef.current) {
@@ -74,7 +63,7 @@ export const useChatSync = () => {
       title: "Writer Access Granted",
       description: "Exclusive write access acquired",
     });
-  }, []);
+  }, [setChatState]);
 
   const releaseWriteLock = useCallback(() => {
     lockRef.current = false;
@@ -84,7 +73,7 @@ export const useChatSync = () => {
       activeWriters: 0,
       writeLock: false,
     }));
-  }, []);
+  }, [setChatState]);
 
   const sendMessage = useCallback((content: string, author: string, role: ClientRole) => {
     acquireWriteLock();
@@ -110,7 +99,7 @@ export const useChatSync = () => {
         description: "Write lock released",
       });
     }, 500);
-  }, [acquireWriteLock, releaseWriteLock]);
+  }, [acquireWriteLock, releaseWriteLock, setChatState]);
 
   return {
     chatState,
